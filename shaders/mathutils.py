@@ -2,15 +2,6 @@ class __vec__(object):
     def __init__(self, values):
         self._values = values
 
-    def __newvec__(values):
-        assert len(values) in [2, 3, 4]
-        if len(values) == 2:
-            return vec2(values)
-        if len(values) == 3:
-            return vec3(values)
-        if len(values) == 4:
-            return vec4(values)
-
     def __getattr__(self, attrs):
         if not _is_swizzle_attrs(attrs):
             return self.__dict__[attrs]
@@ -18,7 +9,7 @@ class __vec__(object):
         values = [self._values[i] for i in indices]
         if len(attrs) == 1:
             return values[0]
-        return __vec__.__newvec__(values)
+        return vec(values)
 
     def __setattr__(self, attrs, value):
         if not _is_swizzle_attrs(attrs):
@@ -54,13 +45,19 @@ class __vec__(object):
         if not isinstance(val, __vec__):
             val = [val for i in range(0, length)]
         values = [op(self[i], val[i]) for i in range(0, length)]
-        return __vec__.__newvec__(values)
+        return vec(values)
 
     def __add__(self, val):
         return self.__custom_op__(val, lambda a, b: a+b)
 
+    def __radd__(self, val):
+        return self.__custom_op__(val, lambda a, b: a+b)
+
     def __sub__(self, val):
         return self.__custom_op__(val, lambda a, b: a-b)
+
+    def __rsub__(self, val):
+        return self.__custom_op__(val, lambda a, b: b-a)
 
     def __mul__(self, val):
         return self.__custom_op__(val, lambda a, b: a*b)
@@ -77,7 +74,7 @@ class __vec__(object):
             v = min if v < min else v
             v = max if v > max else v
             values.append(v)
-        return __vec__.__newvec__(values)
+        return vec(values)
 
 
 class vec2(__vec__):
@@ -93,6 +90,16 @@ class vec3(__vec__):
 class vec4(__vec__):
     def __init__(self, *args):
         super().__init__(flatten(args, 4))
+
+
+def vec(values):
+    assert len(values) in [2, 3, 4]
+    if len(values) == 2:
+        return vec2(values)
+    if len(values) == 3:
+        return vec3(values)
+    if len(values) == 4:
+        return vec4(values)
 
 
 def flatten(args, length):
