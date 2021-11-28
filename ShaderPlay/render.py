@@ -19,7 +19,7 @@ def render(shader, size=(256, 256), mode="RGB", show_progress=True):
     for uv in (tqdm(r) if show_progress else r):
         x = int(floor(uv / size[1]))
         y = int(mod(uv, size[1]))
-        ctx.fragCoord = vec2(x+0.5, size[1]-y+0.5)
+        ctx.fragCoord = vec2(x+0.5, size[1]-1-y+0.5)
         ctx.fragColor = vec4(0)
         shader.mainImage(ctx)
         ctx.fragColor = saturate(ctx.fragColor)

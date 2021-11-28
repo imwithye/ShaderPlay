@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import clip as clamp
-from numpy import floor, ceil, sin, cos, tan, mod
+from numpy import power as pow
+from numpy import sqrt, log, dot, floor, ceil, sin, cos, tan, mod
 
 
 def saturate(vec):
