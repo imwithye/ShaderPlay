@@ -1,9 +1,15 @@
-import numpy as np
-
-
 class __vec__(object):
     def __init__(self, values):
-        self._values = np.array(values)
+        self._values = values
+
+    def __newvec__(values):
+        assert len(values) in [2, 3, 4]
+        if len(values) == 2:
+            return vec2(values)
+        if len(values) == 3:
+            return vec3(values)
+        if len(values) == 4:
+            return vec4(values)
 
     def __getattr__(self, attrs):
         if not _is_swizzle_attrs(attrs):
@@ -12,12 +18,7 @@ class __vec__(object):
         values = [self._values[i] for i in indices]
         if len(attrs) == 1:
             return values[0]
-        if len(attrs) == 2:
-            return vec2(values)
-        if len(attrs) == 3:
-            return vec3(values)
-        if len(attrs) == 3:
-            return vec4(values)
+        return __vec__.__newvec__(values)
 
     def __setattr__(self, attrs, value):
         if not _is_swizzle_attrs(attrs):
@@ -47,8 +48,36 @@ class __vec__(object):
     def __repr__(self):
         return self.__str__()
 
+    def __custom_op__(self, val, op):
+        length = len(self._values)
+        assert length == 2 or length == 3 or length == 4
+        if not isinstance(val, __vec__):
+            val = [val for i in range(0, length)]
+        values = [op(self[i], val[i]) for i in range(0, length)]
+        return __vec__.__newvec__(values)
+
+    def __add__(self, val):
+        return self.__custom_op__(val, lambda a, b: a+b)
+
+    def __sub__(self, val):
+        return self.__custom_op__(val, lambda a, b: a-b)
+
+    def __mul__(self, val):
+        return self.__custom_op__(val, lambda a, b: a*b)
+
+    def __rmul__(self, val):
+        return self.__custom_op__(val, lambda a, b: a*b)
+
+    def __truediv__(self, val):
+        return self.__custom_op__(val, lambda a, b: a/b)
+
     def clamp(self, min=0.0, max=1.0):
-        return __vec__(self._values.clip(min, max))
+        values = []
+        for v in self._values:
+            v = min if v < min else v
+            v = max if v > max else v
+            values.append(v)
+        return __vec__.__newvec__(values)
 
 
 class vec2(__vec__):

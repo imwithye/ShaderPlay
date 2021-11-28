@@ -9,7 +9,8 @@ def draw(shader, size=(256, 256), mode="RGB"):
     ctx = Context(vec2(size))
     for x in range(0, size[0]):
         for y in range(0, size[1]):
-            ctx.fragCoord = vec2(x, y)
+            # range from 0.5 to resolution-0.5
+            ctx.fragCoord = vec2(x+0.5, size[1]-y+0.5)
             ctx.fragColor = vec4()
             shader.mainImage(ctx)
             ctx.fragColor = saturate(ctx.fragColor)
